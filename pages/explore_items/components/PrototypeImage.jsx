@@ -9,9 +9,9 @@ export default function PrototypeImage({ item }) {
                 className="w-full h-40 object-cover rounded-md mb-3"
             />
             <p className="font-semibold text-lg text-white">{item.title}</p>
-            <p className="text-sm text-white-300 mt-5">Statut : {item.status}</p>
-            <p className="text-sm text-white-300 mt-5">Localisation : {item.codePostal}</p>
-            <p className="text-sm text-white-300 mt-5">Ville : {item.ville}</p>
+            <p className="text-sm text-white-300 mt-5">Statut : {item.statusId.statusName}</p>
+            <p className="text-sm text-white-300 mt-5">Localisation : {item.postalCode}</p>
+            <p className="text-sm text-white-300 mt-5">Ville : {item.city}</p>
 
             {item.distance !== undefined && item.distance !== null && (
                 <p className="text-sm text-green-300 mt-5">

@@ -15,6 +15,7 @@ export default function FormAddItem() {
     } = useForm();
 
     const [message, setMessage] = useState('');
+    const [statusList, setStatusList] = useState([]);
     const addressRef = useRef(null);
 
     const { isLoaded } = useLoadScript({
@@ -22,6 +23,22 @@ export default function FormAddItem() {
         libraries: ['places'],
     });
 
+    // Chargement des statuts depuis le backend
+    useEffect(() => {
+        const fetchStatuses = async () => {
+            try {
+                const res = await fetch('http://localhost:8080/status/all');
+                const data = await res.json();
+                setStatusList(data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des statuts :', error);
+            }
+        };
+
+        fetchStatuses();
+    }, []);
+
+    // Autocomplete pour l'adresse
     useEffect(() => {
         if (!isLoaded || !addressRef.current) return;
 
@@ -38,18 +55,40 @@ export default function FormAddItem() {
         });
     }, [isLoaded, setValue]);
 
-    const onSubmit = (data) => {
-        console.log('Item à enregistrer (envoyé au backend) :', data);
-        setMessage('✅ Objet publié avec succès !');
-        reset();
-        setTimeout(() => setMessage(''), 3000);
+    // Soumission du formulaire
+    const onSubmit = async (data) => {
+        try {
+            const payload = {
+                title: data.title,
+                image: data.image,
+                statusId: { id: parseInt(data.statusId) },
+                postalCode: data.adresse,
+            };
+
+            const response = await fetch('http://localhost:8080/item/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) throw new Error('Erreur lors de la création');
+
+            setMessage('✅ Objet publié avec succès !');
+            reset();
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error) {
+            console.error('Erreur de soumission :', error);
+            setMessage('❌ Échec de la publication');
+        }
     };
 
     return (
         <div className="max-w-xl mx-auto p-6">
             {message && <p className="text-green-600 font-semibold mb-4">{message}</p>}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4 m-6">
                 <input
                     type="text"
                     placeholder="Titre de l'objet*"
@@ -62,56 +101,50 @@ export default function FormAddItem() {
                 />
                 {errors.title && <p className="text-red-600">{errors.title.message}</p>}
 
-                <textarea
-                    placeholder="Description"
-                    rows={4}
-                    {...register('description', {
-                        required: 'Description requise',
-                        minLength: { value: 10, message: 'Min. 10 caractères' },
-                        maxLength: { value: 1000, message: 'Max. 1000 caractères' },
-                    })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded resize-none focus:border-green-700 focus:outline-none"
-                />
-                {errors.description && <p className="text-red-600">{errors.description.message}</p>}
-
                 <input
                     type="text"
-                    placeholder="Code postal*"
+                    placeholder="code postal* ex :A1A 1A1"
                     ref={addressRef}
                     {...register('adresse', {
-                        required: 'Adresse ou code postal requis',
-                        minLength: { value: 4, message: 'Adresse trop courte' },
+                        required: 'Code postal requis',
+                        minLength: { value: 7, message: 'Code postal trop court' },
+                        maxLength: { value: 7, message: 'Code postal trop long' },
+                        pattern: {
+                            value: /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/,
+                            message: 'Format invalide (ex:A1A 1A1)',
+                        },
                     })}
-                    className="w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none"
+                    className="w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none uppercase"
+                    maxLength={7}
                 />
                 {errors.adresse && <p className="text-red-600">{errors.adresse.message}</p>}
 
                 <input
-                    type="file"
-                    {...register('image', { required: 'Image requise' })}
-                    className="w-full px-4 py-2 border-b border-gray-300 rounded cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 focus:border-green-700 focus:outline-none"
+                    type="text"
+                    placeholder="Lien vers l’image (URL)*"
+                    {...register('image', {
+                        required: 'Lien image requis',
+                        pattern: {
+                            value: /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif|-webp)$/i,
+                            message: 'Lien image invalide (ex: .jpg/.png)',
+                        },
+                    })}
+                    className="w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none"
                 />
                 {errors.image && <p className="text-red-600">{errors.image.message}</p>}
 
                 <select
-                    {...register('categoryId', { required: 'Catégorie requise' })}
-                    className="w-full px-4 py-2 border-b rounded focus:border-green-700 focus:outline-none"
-                >
-                    <option value="">-- Choisir une catégorie --</option>
-                    <option value={1}>Électronique</option>
-                    <option value={2}>Vêtements</option>
-                    <option value={3}>Maison</option>
-                </select>
-                {errors.categoryId && <p className="text-red-600">{errors.categoryId.message}</p>}
-
-                <select
                     {...register('statusId', { required: 'Statut requis' })}
-                    className="w-full px-4 py-2 border-b rounded focus:border-green-700 focus:outline-none"
+                    className="w-full px-4 py-2 border-b rounded focus:border-green-700 focus:outline-none text-green-700 "
                 >
-                    <option value="">-- Choisir un statut --</option>
-                    <option value={1}>Neuf</option>
-                    <option value={2}>Bon état</option>
-                    <option value={3}>À réparer</option>
+                    <option value="" className="text-white">
+                        -- Choisir un statut --
+                    </option>
+                    {statusList.map((status) => (
+                        <option key={status.id} value={status.id}>
+                            {status.name}
+                        </option>
+                    ))}
                 </select>
                 {errors.statusId && <p className="text-red-600">{errors.statusId.message}</p>}
 
