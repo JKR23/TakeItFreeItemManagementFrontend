@@ -58,19 +58,15 @@ export default function FormAddItem() {
     // Soumission du formulaire
     const onSubmit = async (data) => {
         try {
-            const payload = {
-                title: data.title,
-                image: data.image,
-                statusId: { id: parseInt(data.statusId) },
-                postalCode: data.adresse,
-            };
+            const formData = new FormData();
+            formData.append('title', data.title);
+            formData.append('postalCode', data.adresse);
+            formData.append('statusId', data.statusId);
+            formData.append('image', data.imageFile[0]); // fichier
 
             const response = await fetch('http://localhost:8080/item/add', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
+                body: formData,
             });
 
             if (!response.ok) throw new Error('Erreur lors de la création');
@@ -120,14 +116,11 @@ export default function FormAddItem() {
                 {errors.adresse && <p className="text-red-600">{errors.adresse.message}</p>}
 
                 <input
-                    type="text"
+                    type="file"
+                    accept="image/*"
                     placeholder="Lien vers l’image (URL)*"
-                    {...register('image', {
-                        required: 'Lien image requis',
-                        pattern: {
-                            value: /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif|-webp)$/i,
-                            message: 'Lien image invalide (ex: .jpg/.png)',
-                        },
+                    {...register('imageFile', {
+                        required: 'Image requis',
                     })}
                     className="w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none"
                 />
