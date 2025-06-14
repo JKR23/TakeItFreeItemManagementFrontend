@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
-import PrototypeImage from '@/pages/explore_items/components/PrototypeImage';
+import PrototypeImageExtra from '@/pages/mes_items/components/PrototypeImageExtra';
 
-export default function DisplayItems() {
+export default function DisplayMesItems() {
     const [items, setItems] = useState([]);
     const [startIndex, setStartIndex] = useState(0);
     const itemsPerPage = 8;
@@ -25,7 +25,7 @@ export default function DisplayItems() {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-                const response = await fetch('http://localhost:8080/status/items-all');
+                const response = await fetch('http://localhost:8080/item/all');
                 const data = await response.json();
 
                 if (!Array.isArray(data)) {
@@ -88,10 +88,10 @@ export default function DisplayItems() {
 
     return (
         <div className="p-4">
-            <h2 className="text-3xl font-bold mb-4">Items à récupérer</h2>
+            <h2 className="text-3xl font-bold mb-4">Items publiés</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {currentItems.map((item, index) => (
-                    <PrototypeImage key={index} item={item} />
+                    <PrototypeImageExtra key={index} item={item} />
                 ))}
             </div>
             <div className="flex justify-between mt-4">
