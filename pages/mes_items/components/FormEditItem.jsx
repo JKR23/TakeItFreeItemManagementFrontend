@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 
 import { useEffect, useRef, useState } from 'react';
 
-export default function FormAddItem() {
+export default function FormEditItem() {
     const {
         register,
         handleSubmit,

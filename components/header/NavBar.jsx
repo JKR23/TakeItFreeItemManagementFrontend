@@ -12,7 +12,7 @@ const navItems = [
     { label: 'TakeItFree', href: '/' },
     { label: 'Explore-Items', href: '/explore-items' },
     { label: 'Publier-Items', href: '/publier-items' },
-    /*{ label: 'Apropos', href: '/realisations' }, */
+    { label: 'Mes-Items', href: '/mes-items' },
     { label: 'Contactez-nous', href: '/contactez-nous' },
 ];
 

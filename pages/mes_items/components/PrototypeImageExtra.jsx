@@ -1,6 +1,12 @@
 'use client';
 
-export default function PrototypeImage({ item }) {
+import ItemTakenButton from '@/pages/mes_items/components/ItemTakenButton';
+
+export default function PrototypeImageExtra({ item }) {
+    const handleUpdateItem = () => {
+        console.log('Rediriger vers la modification de l’item', item.id);
+    };
+
     return (
         <div className="bg-green-800 rounded-2xl shadow-md p-4 hover:scale-105 transition-transform">
             <img
@@ -20,6 +26,16 @@ export default function PrototypeImage({ item }) {
                         📍 À {item.distance < 1 ? 'moins d’1' : item.distance.toFixed(1)} km de vous
                     </p>
                 )}
+            </div>
+
+            <div className="mt-4 flex flex-col gap-2">
+                <ItemTakenButton itemId={item.id} />
+                <button
+                    onClick={handleUpdateItem}
+                    className="bg-white text-green-800 py-2 px-4 rounded-lg font-semibold hover:bg-gray-200 transition"
+                >
+                    Modifier item
+                </button>
             </div>
         </div>
     );
