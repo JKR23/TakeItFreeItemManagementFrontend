@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 
 import { useEffect, useRef, useState } from 'react';
 
-export default function FormEditItem() {
+export default function FormEditItem({ item, onCancel }) {
     const {
         register,
         handleSubmit,
@@ -23,7 +23,14 @@ export default function FormEditItem() {
         libraries: ['places'],
     });
 
-    // Chargement des statuts depuis le backend
+    useEffect(() => {
+        if (item) {
+            setValue('title', item.title);
+            setValue('adresse', item.postalCode);
+            setValue('statusId', item.statusId.id);
+        }
+    }, [item, setValue]);
+
     useEffect(() => {
         const fetchStatuses = async () => {
             try {
@@ -34,11 +41,9 @@ export default function FormEditItem() {
                 console.error('Erreur lors de la récupération des statuts :', error);
             }
         };
-
         fetchStatuses();
     }, []);
 
-    // Autocomplete pour l'adresse
     useEffect(() => {
         if (!isLoaded || !addressRef.current) return;
 
@@ -55,36 +60,39 @@ export default function FormEditItem() {
         });
     }, [isLoaded, setValue]);
 
-    // Soumission du formulaire
     const onSubmit = async (data) => {
         try {
             const formData = new FormData();
+            formData.append('id', item.id);
             formData.append('title', data.title);
             formData.append('postalCode', data.adresse);
             formData.append('statusId', data.statusId);
-            formData.append('image', data.imageFile[0]); // fichier
+            formData.append('image', data.imageFile[0]);
 
-            const response = await fetch('http://localhost:8080/item/add', {
-                method: 'POST',
+            const response = await fetch(`http://localhost:8080/item/update`, {
+                method: 'PUT',
                 body: formData,
             });
 
-            if (!response.ok) throw new Error('Erreur lors de la création');
+            if (!response.ok) throw new Error('Erreur lors de la modification');
 
-            setMessage('✅ Objet publié avec succès !');
-            reset();
-            setTimeout(() => setMessage(''), 3000);
+            setMessage('✅ Modifications enregistrées !');
+            // Attendre un court instant avant de fermer (pour afficher brièvement le message)
+            setTimeout(() => {
+                setMessage('');
+                onCancel(); //ferme le formulaire
+            }, 1000);
         } catch (error) {
-            console.error('Erreur de soumission :', error);
-            setMessage('❌ Échec de la publication');
+            console.error('Erreur de modification :', error);
+            setMessage('❌ Échec de la modification');
         }
     };
 
     return (
-        <div className="max-w-xl mx-auto p-6">
+        <div className="max-w-xl mx-auto p-6 rounded bg-green-900">
             {message && <p className="text-green-600 font-semibold mb-4">{message}</p>}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4 m-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4 m-6 ">
                 <input
                     type="text"
                     placeholder="Titre de l'objet*"
@@ -103,8 +111,6 @@ export default function FormEditItem() {
                     ref={addressRef}
                     {...register('adresse', {
                         required: 'Code postal requis',
-                        minLength: { value: 7, message: 'Code postal trop court' },
-                        maxLength: { value: 7, message: 'Code postal trop long' },
                         pattern: {
                             value: /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/,
                             message: 'Format invalide (ex:A1A 1A1)',
@@ -118,21 +124,18 @@ export default function FormEditItem() {
                 <input
                     type="file"
                     accept="image/*"
-                    placeholder="Lien vers l’image (URL)*"
                     {...register('imageFile', {
-                        required: 'Image requis',
+                        required: 'Une image est requise',
                     })}
                     className="w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none"
                 />
-                {errors.image && <p className="text-red-600">{errors.image.message}</p>}
+                {errors.imageFile && <p className="text-red-600">{errors.imageFile.message}</p>}
 
                 <select
                     {...register('statusId', { required: 'Statut requis' })}
-                    className="w-full px-4 py-2 border-b rounded focus:border-green-700 focus:outline-none text-green-700 "
+                    className="w-full px-4 py-2 border-b rounded focus:border-green-700 focus:outline-none text-green-700"
                 >
-                    <option value="" className="text-white">
-                        -- Choisir un statut --
-                    </option>
+                    <option value="">-- Choisir un statut --</option>
                     {statusList.map((status) => (
                         <option key={status.id} value={status.id}>
                             {status.name}
@@ -141,12 +144,21 @@ export default function FormEditItem() {
                 </select>
                 {errors.statusId && <p className="text-red-600">{errors.statusId.message}</p>}
 
-                <button
-                    type="submit"
-                    className="bg-green-900 text-white px-6 py-2 rounded hover:bg-green-600 transition"
-                >
-                    Publier l’objet
-                </button>
+                <div className="flex justify-between gap-4">
+                    <button
+                        type="submit"
+                        className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
+                    >
+                        Enregistrer
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition"
+                    >
+                        Annuler
+                    </button>
+                </div>
             </form>
         </div>
     );

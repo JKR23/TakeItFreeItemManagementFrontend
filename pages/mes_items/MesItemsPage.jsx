@@ -1,3 +1,4 @@
+/*'use client';*/
 import SearchZone from '@/pages/explore_items/components/SearchZone';
 import DisplayMesItems from '@/pages/mes_items/components/DisplayMesItems';
 
