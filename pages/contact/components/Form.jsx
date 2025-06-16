@@ -24,11 +24,6 @@ export default function FormContact() {
     const [successMessage, setSuccessMessage] = useState('');
 
     const sendEmail = (values) => {
-        /**const serviceID = 'service_bexcgi5';
-      const templateID = 'template_4o5bl0f';
-     const publicKey = 'ocrVTh8KJ36IuszAK';*/
-
-        //ils vont les chercher dans vercel
         const serviceID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
         const templateID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
         const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
@@ -56,7 +51,7 @@ export default function FormContact() {
     };
 
     return (
-        <div className="w-1/3">
+        <div className="w-full max-w-xl px-4 sm:px-6 lg:px-8 mx-auto">
             {successMessage && (
                 <div className="mb-4 px-4 py-2 rounded bg-green-100 text-green-800 font-semibold flex items-center gap-2">
                     <svg className="w-5 h-5 fill-green-600" viewBox="0 0 20 20">
@@ -68,7 +63,7 @@ export default function FormContact() {
 
             <form
                 onSubmit={handleSubmit(sendEmail)}
-                className="space-y-4 backdrop-blur-sm p-6 rounded-lg shadow-md m-8"
+                className="space-y-4 bg-green-800 bg-opacity-10 backdrop-blur-sm p-6 rounded-lg shadow-md"
             >
                 <input
                     type="text"
@@ -78,7 +73,7 @@ export default function FormContact() {
                         minLength: { value: 2, message: 'Min. 2 caractères.' },
                         maxLength: { value: 20, message: 'Max. 20 caractères.' },
                     })}
-                    className="w-full px-4 py-2 border-b border-gray-300 rounded focus:border-green-600 focus:outline-none"
+                    className="w-full px-4 py-2 border-b border-gray-300 rounded focus:border-green-600 focus:outline-none bg-transparent text-white placeholder-white"
                 />
                 {errors.nom && <p className="text-red-600 italic text-sm">{errors.nom.message}</p>}
 
@@ -90,7 +85,7 @@ export default function FormContact() {
                         pattern: { value: /^\d+$/, message: 'Chiffres uniquement.' },
                         maxLength: { value: 14, message: 'Max. 14 chiffres.' },
                     })}
-                    className="w-full px-4 py-2 border-b border-gray-300 rounded focus:border-green-600 focus:outline-none"
+                    className="w-full px-4 py-2 border-b border-gray-300 rounded focus:border-green-600 focus:outline-none bg-transparent text-white placeholder-white"
                 />
                 {errors.telephone && (
                     <p className="text-red-600 italic text-sm">{errors.telephone.message}</p>
@@ -107,7 +102,7 @@ export default function FormContact() {
                                 /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Format email invalide.',
                         },
                     })}
-                    className="w-full px-4 py-2 border-b border-gray-300 rounded focus:border-green-600 focus:outline-none"
+                    className="w-full px-4 py-2 border-b border-gray-300 rounded focus:border-green-600 focus:outline-none bg-transparent text-white placeholder-white"
                 />
                 {errors.email && (
                     <p className="text-red-600 italic text-sm">{errors.email.message}</p>
@@ -121,7 +116,7 @@ export default function FormContact() {
                         minLength: { value: 5, message: 'Min. 5 caractères.' },
                         maxLength: { value: 30, message: 'Max. 30 caractères.' },
                     })}
-                    className="w-full px-4 py-2 border-b border-gray-300 rounded focus:border-green-600 focus:outline-none"
+                    className="w-full px-4 py-2 border-b border-gray-300 rounded focus:border-green-600 focus:outline-none bg-transparent text-white placeholder-white"
                 />
                 {errors.objet && (
                     <p className="text-red-600 italic text-sm">{errors.objet.message}</p>
@@ -134,7 +129,7 @@ export default function FormContact() {
                         required: 'Le message est requis.',
                         maxLength: { value: 500, message: 'Max. 500 caractères.' },
                     })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded resize-none focus:border-green-600 focus:outline-none"
+                    className="w-full px-4 py-2 border border-gray-300 rounded resize-none focus:border-green-600 focus:outline-none bg-transparent text-white placeholder-white"
                 ></textarea>
                 {errors.commentaires && (
                     <p className="text-red-600 italic text-sm">{errors.commentaires.message}</p>

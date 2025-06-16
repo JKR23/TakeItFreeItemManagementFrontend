@@ -23,7 +23,6 @@ export default function FormAddItem() {
         libraries: ['places'],
     });
 
-    // Chargement des statuts depuis le backend
     useEffect(() => {
         const fetchStatuses = async () => {
             try {
@@ -34,11 +33,9 @@ export default function FormAddItem() {
                 console.error('Erreur lors de la récupération des statuts :', error);
             }
         };
-
         fetchStatuses();
     }, []);
 
-    // Autocomplete pour l'adresse
     useEffect(() => {
         if (!isLoaded || !addressRef.current) return;
 
@@ -55,14 +52,13 @@ export default function FormAddItem() {
         });
     }, [isLoaded, setValue]);
 
-    // Soumission du formulaire
     const onSubmit = async (data) => {
         try {
             const formData = new FormData();
             formData.append('title', data.title);
             formData.append('postalCode', data.adresse);
             formData.append('statusId', data.statusId);
-            formData.append('image', data.imageFile[0]); // fichier
+            formData.append('image', data.imageFile[0]);
 
             const response = await fetch('http://localhost:8080/item/add', {
                 method: 'POST',
@@ -81,10 +77,18 @@ export default function FormAddItem() {
     };
 
     return (
-        <div className="max-w-xl mx-auto p-6">
-            {message && <p className="text-green-600 font-semibold mb-4">{message}</p>}
+        <div className="max-w-lg mx-auto p-6 sm:p-8 md:p-10 rounded-lg shadow-md bg-green-800 mb-12 mt-5">
+            {message && (
+                <p
+                    className={`mb-6 text-center font-semibold ${
+                        message.startsWith('✅') ? 'text-green-600' : 'text-red-600'
+                    }`}
+                >
+                    {message}
+                </p>
+            )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4 m-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 ">
                 <input
                     type="text"
                     placeholder="Titre de l'objet*"
@@ -93,13 +97,17 @@ export default function FormAddItem() {
                         minLength: { value: 2, message: 'Min. 2 caractères' },
                         maxLength: { value: 100, message: 'Max. 100 caractères' },
                     })}
-                    className="w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none"
+                    className={`w-full px-4 py-3 border-b border-gray-300 focus:border-green-700 focus:outline-none rounded-md placeholder-white ${
+                        errors.title ? 'border-red-500' : ''
+                    }`}
                 />
-                {errors.title && <p className="text-red-600">{errors.title.message}</p>}
+                {errors.title && (
+                    <p className="text-red-600 text-sm mt-1">{errors.title.message}</p>
+                )}
 
                 <input
                     type="text"
-                    placeholder="code postal* ex :A1A 1A1"
+                    placeholder="Code postal* ex : A1A 1A1"
                     ref={addressRef}
                     {...register('adresse', {
                         required: 'Code postal requis',
@@ -107,43 +115,52 @@ export default function FormAddItem() {
                         maxLength: { value: 7, message: 'Code postal trop long' },
                         pattern: {
                             value: /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/,
-                            message: 'Format invalide (ex:A1A 1A1)',
+                            message: 'Format invalide (ex : A1A 1A1)',
                         },
                     })}
-                    className="w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none uppercase"
                     maxLength={7}
+                    className={`w-full px-4 py-3 border-b border-gray-300 focus:border-green-700 focus:outline-none uppercase rounded-md placeholder-white ${
+                        errors.adresse ? 'border-red-500' : ''
+                    }`}
                 />
-                {errors.adresse && <p className="text-red-600">{errors.adresse.message}</p>}
+                {errors.adresse && (
+                    <p className="text-red-600 text-sm mt-1">{errors.adresse.message}</p>
+                )}
 
                 <input
                     type="file"
                     accept="image/*"
-                    placeholder="Lien vers l’image (URL)*"
                     {...register('imageFile', {
-                        required: 'Image requis',
+                        required: 'Image requise',
                     })}
-                    className="w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none"
+                    className={`w-full px-4 py-2 border-b border-gray-300 focus:border-green-700 focus:outline-none rounded-md ${
+                        errors.imageFile ? 'border-red-500' : ''
+                    }`}
                 />
-                {errors.image && <p className="text-red-600">{errors.image.message}</p>}
+                {errors.imageFile && (
+                    <p className="text-red-600 text-sm mt-1">{errors.imageFile.message}</p>
+                )}
 
                 <select
                     {...register('statusId', { required: 'Statut requis' })}
-                    className="w-full px-4 py-2 border-b rounded focus:border-green-700 focus:outline-none text-green-700 "
+                    className={`w-full px-4 py-3 border-b rounded-md focus:border-green-700 focus:outline-none text-green-700 ${
+                        errors.statusId ? 'border-red-500' : ''
+                    }`}
                 >
-                    <option value="" className="text-white">
-                        -- Choisir un statut --
-                    </option>
+                    <option value="">-- Choisir un statut --</option>
                     {statusList.map((status) => (
                         <option key={status.id} value={status.id}>
                             {status.name}
                         </option>
                     ))}
                 </select>
-                {errors.statusId && <p className="text-red-600">{errors.statusId.message}</p>}
+                {errors.statusId && (
+                    <p className="text-red-600 text-sm mt-1">{errors.statusId.message}</p>
+                )}
 
                 <button
                     type="submit"
-                    className="bg-green-900 text-white px-6 py-2 rounded hover:bg-green-600 transition"
+                    className="w-full bg-green-900 text-white font-semibold py-3 rounded-md hover:bg-green-700 transition"
                 >
                     Publier l’objet
                 </button>

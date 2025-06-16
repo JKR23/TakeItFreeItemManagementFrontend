@@ -71,7 +71,7 @@ export default function DisplayMesItems({ items: itemsFromProps = [] }) {
     useEffect(() => {
         if (itemsFromProps && itemsFromProps.length > 0) {
             setItems(itemsFromProps);
-            setStartIndex(0); // Réinitialise la pagination quand les résultats changent
+            setStartIndex(0);
         } else {
             fetchItems();
         }
@@ -101,18 +101,18 @@ export default function DisplayMesItems({ items: itemsFromProps = [] }) {
                 ))}
             </div>
 
-            <div className="flex justify-between mt-4">
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-4">
                 <button
                     onClick={handlePrevious}
                     disabled={startIndex === 0}
-                    className="px-4 py-2 bg-green-800 shadow-md cursor-pointer text-white rounded disabled:bg-gray-400"
+                    className="w-full sm:w-auto px-4 py-2 bg-green-800 text-white rounded shadow-md disabled:bg-gray-400"
                 >
                     ←
                 </button>
                 <button
                     onClick={handleNext}
                     disabled={startIndex + itemsPerPage >= items.length}
-                    className="px-4 py-2 bg-green-800 cursor-pointer text-white shadow-md rounded disabled:bg-gray-400"
+                    className="w-full sm:w-auto px-4 py-2 bg-green-800 text-white rounded shadow-md disabled:bg-gray-400"
                 >
                     →
                 </button>

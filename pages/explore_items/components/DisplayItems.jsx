@@ -71,8 +71,8 @@ export default function DisplayItems({ items: itemsFromProps = [] }) {
     useEffect(() => {
         if (itemsFromProps && itemsFromProps.length > 0) {
             setItems(itemsFromProps);
-            setStartIndex(0); // ✅ Réinitialisation de la pagination
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // ✅ Scroll vers le haut
+            setStartIndex(0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
             loadDefaultItems();
         }
@@ -94,30 +94,32 @@ export default function DisplayItems({ items: itemsFromProps = [] }) {
 
     return (
         <div className="p-4">
-            <h2 className="text-3xl font-bold mb-4">Items à récupérer</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
+                Items à récupérer
+            </h2>
 
             {items.length === 0 ? (
-                <p className="text-gray-500">Aucun item trouvé.</p>
+                <p className="text-gray-500 text-center">Aucun item trouvé.</p>
             ) : (
                 <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                         {currentItems.map((item, index) => (
                             <PrototypeImage key={index} item={item} />
                         ))}
                     </div>
 
-                    <div className="flex justify-between mt-4">
+                    <div className="flex justify-center sm:justify-between mt-6 gap-4">
                         <button
                             onClick={handlePrevious}
                             disabled={startIndex === 0}
-                            className="px-4 py-2 bg-green-800 shadow-md cursor-pointer text-white rounded disabled:bg-gray-400"
+                            className="px-4 py-2 bg-green-800 text-white rounded shadow-md disabled:bg-gray-400"
                         >
                             ←
                         </button>
                         <button
                             onClick={handleNext}
                             disabled={startIndex + itemsPerPage >= items.length}
-                            className="px-4 py-2 bg-green-800 cursor-pointer text-white shadow-md rounded disabled:bg-gray-400"
+                            className="px-4 py-2 bg-green-800 text-white rounded shadow-md disabled:bg-gray-400"
                         >
                             →
                         </button>

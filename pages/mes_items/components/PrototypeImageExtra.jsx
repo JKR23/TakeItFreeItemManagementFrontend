@@ -9,10 +9,6 @@ import EditItemButton from '@/pages/mes_items/components/buttons/EditItemButton'
 import ItemTakenButton from '@/pages/mes_items/components/buttons/ItemTakenButton';
 
 export default function PrototypeImageExtra({ item }) {
-    /*const handleUpdateItem = () => {
-        console.log('Rediriger vers la modification de l’item', item.id);
-    };*/
-
     const [isEditing, setIsEditing] = useState(false);
 
     const handleUpdateItem = () => {
@@ -46,7 +42,7 @@ export default function PrototypeImageExtra({ item }) {
                     )}
                 </div>
 
-                <div className="mt-4 flex flex-col gap-2">
+                <div className="mt-4 flex flex-col sm:flex-row gap-2">
                     <ItemTakenButton itemId={item.id} />
                     <EditItemButton onClick={handleUpdateItem} />
                 </div>
