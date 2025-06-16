@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const navItems = [
     { label: 'TakeItFree', href: '/' },
@@ -18,9 +19,12 @@ const navItems = [
 
 export default function NavBars() {
     const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
 
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
+
+    const isActive = (href) => pathname === href;
 
     return (
         <nav className="bg-green-800 text-secondary-color shadow-md relative z-50">
@@ -49,7 +53,12 @@ export default function NavBars() {
                 <ul className="hidden sm:flex gap-8 text-base sm:text-lg font-semibold">
                     {navItems.map(({ label, href }, i) => (
                         <li key={i}>
-                            <Link href={href} className="hover:text-green-300 transition">
+                            <Link
+                                href={href}
+                                className={`transition ${
+                                    isActive(href) ? 'text-green-300' : 'hover:text-green-300'
+                                }`}
+                            >
                                 {label}
                             </Link>
                         </li>
@@ -75,8 +84,12 @@ export default function NavBars() {
                         <Link
                             key={i}
                             href={href}
-                            className="hover:text-yellow-500 w-full"
                             onClick={closeMenu}
+                            className={`w-full ${
+                                isActive(href)
+                                    ? 'text-yellow-500'
+                                    : 'hover:text-yellow-500 text-gray-800'
+                            }`}
                         >
                             {label}
                         </Link>

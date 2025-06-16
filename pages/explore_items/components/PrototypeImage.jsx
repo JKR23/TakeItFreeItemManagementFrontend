@@ -5,10 +5,8 @@ export default function PrototypeImage({ item }) {
         <div className="bg-green-800 rounded-2xl shadow-md p-4 hover:scale-105 transition-transform">
             <img
                 src={item.image}
-                width={150}
-                height={100}
                 alt={item.title}
-                className="w-full h-40 object-cover rounded-md mb-3"
+                className="w-full h-40 object-contain rounded-md mb-3 bg-green-900"
             />
             <p className="font-semibold text-lg text-white">{item.title}</p>
             <div className="mt-3 bg-green-900 rounded-lg p-4">
