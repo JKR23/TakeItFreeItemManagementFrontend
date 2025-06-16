@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import PrototypeImageExtra from '@/pages/mes_items/components/PrototypeImageExtra';
 
-export default function DisplayMesItems() {
+export default function DisplayMesItems({ items: itemsFromProps = [] }) {
     const [items, setItems] = useState([]);
     const [startIndex, setStartIndex] = useState(0);
     const itemsPerPage = 8;
@@ -22,55 +22,60 @@ export default function DisplayMesItems() {
         return R * c;
     }
 
-    useEffect(() => {
-        const fetchItems = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/item/all');
-                const data = await response.json();
+    const fetchItems = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/item/all');
+            const data = await response.json();
 
-                if (!Array.isArray(data)) {
-                    console.error('Format de données invalide');
-                    setItems([]);
-                    return;
-                }
-
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            const userLat = position.coords.latitude;
-                            const userLon = position.coords.longitude;
-
-                            const itemsWithDistance = data.map((item) => {
-                                if (item.latitude && item.longitude) {
-                                    const distance = getDistanceFromLatLonInKm(
-                                        userLat,
-                                        userLon,
-                                        item.latitude,
-                                        item.longitude,
-                                    );
-                                    return { ...item, distance: parseFloat(distance.toFixed(2)) };
-                                }
-                                return item;
-                            });
-
-                            itemsWithDistance.sort((a, b) => a.distance - b.distance);
-                            setItems(itemsWithDistance);
-                        },
-                        (error) => {
-                            console.error('Erreur géolocalisation :', error);
-                            setItems(data);
-                        },
-                    );
-                } else {
-                    setItems(data);
-                }
-            } catch (error) {
-                console.error('Erreur de récupération des items :', error);
+            if (!Array.isArray(data)) {
+                console.error('Format de données invalide');
+                setItems([]);
+                return;
             }
-        };
 
-        fetchItems();
-    }, []);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+
+                        const itemsWithDistance = data.map((item) => {
+                            if (item.latitude && item.longitude) {
+                                const distance = getDistanceFromLatLonInKm(
+                                    userLat,
+                                    userLon,
+                                    item.latitude,
+                                    item.longitude,
+                                );
+                                return { ...item, distance: parseFloat(distance.toFixed(2)) };
+                            }
+                            return item;
+                        });
+
+                        itemsWithDistance.sort((a, b) => a.distance - b.distance);
+                        setItems(itemsWithDistance);
+                    },
+                    (error) => {
+                        console.error('Erreur géolocalisation :', error);
+                        setItems(data);
+                    },
+                );
+            } else {
+                setItems(data);
+            }
+        } catch (error) {
+            console.error('Erreur de récupération des items :', error);
+        }
+    };
+
+    useEffect(() => {
+        if (itemsFromProps && itemsFromProps.length > 0) {
+            setItems(itemsFromProps);
+            setStartIndex(0); // Réinitialise la pagination quand les résultats changent
+        } else {
+            fetchItems();
+        }
+    }, [itemsFromProps]);
 
     const handleNext = () => {
         if (startIndex + itemsPerPage < items.length) {
@@ -89,11 +94,13 @@ export default function DisplayMesItems() {
     return (
         <div className="p-4">
             <h2 className="text-3xl font-bold mb-4">Items publiés</h2>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {currentItems.map((item, index) => (
                     <PrototypeImageExtra key={index} item={item} />
                 ))}
             </div>
+
             <div className="flex justify-between mt-4">
                 <button
                     onClick={handlePrevious}
