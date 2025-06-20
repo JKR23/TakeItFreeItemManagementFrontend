@@ -69,18 +69,24 @@ export default function FormEditItem({ item, onCancel }) {
             formData.append('statusId', data.statusId);
             formData.append('image', data.imageFile[0]);
 
+            // ✅ Récupération du token
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+            if (!token) throw new Error('Token JWT non trouvé');
+
             const response = await fetch(`http://localhost:8080/item/update`, {
                 method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 body: formData,
             });
 
             if (!response.ok) throw new Error('Erreur lors de la modification');
 
             setMessage('✅ Modifications enregistrées !');
-            // Attendre un court instant avant de fermer (pour afficher brièvement le message)
             setTimeout(() => {
                 setMessage('');
-                onCancel(); //ferme le formulaire
+                onCancel(); // ferme le formulaire
             }, 1000);
         } catch (error) {
             console.error('Erreur de modification :', error);
@@ -92,7 +98,7 @@ export default function FormEditItem({ item, onCancel }) {
         <div className="max-w-xl mx-auto p-6 rounded bg-green-900">
             {message && <p className="text-green-600 font-semibold mb-4">{message}</p>}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4 m-6 ">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4 m-6">
                 <input
                     type="text"
                     placeholder="Titre de l'objet*"
