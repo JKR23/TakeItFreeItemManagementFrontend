@@ -24,7 +24,25 @@ export default function DisplayMesItems({ items: itemsFromProps = [] }) {
 
     const fetchItems = async () => {
         try {
-            const response = await fetch('http://localhost:8080/item/all');
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+            if (!token) {
+                console.error('Token JWT non trouvé');
+                setItems([]);
+                return;
+            }
+
+            const response = await fetch('http://localhost:8080/item/my-items', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                console.error('Erreur HTTP:', response.status);
+                setItems([]);
+                return;
+            }
+
             const data = await response.json();
 
             if (!Array.isArray(data)) {
@@ -65,6 +83,7 @@ export default function DisplayMesItems({ items: itemsFromProps = [] }) {
             }
         } catch (error) {
             console.error('Erreur de récupération des items :', error);
+            setItems([]);
         }
     };
 

@@ -3,7 +3,7 @@
 export default function ItemTakenButton({ itemId }) {
     const handleItemTaken = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/item/take/${itemId}`, {
+            const response = await fetch(`http://localhost:8080/item/marked-taken/${itemId}`, {
                 method: 'PUT',
             });
 
