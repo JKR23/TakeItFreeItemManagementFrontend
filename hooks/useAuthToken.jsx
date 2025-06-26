@@ -14,7 +14,6 @@ function isTokenExpired(token) {
     }
 }
 
-// ✅ BONNE PRATIQUE : export par défaut
 export default function useAuthToken({ redirectIfExpired = true } = {}) {
     const [token, setToken] = useState(null);
     const [decodedToken, setDecodedToken] = useState(null);

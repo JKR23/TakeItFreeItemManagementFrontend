@@ -1,11 +1,10 @@
 'use client';
 
+import useAuthToken from '@/hooks/useAuthToken';
 import { useLoadScript } from '@react-google-maps/api';
 import { useForm } from 'react-hook-form';
 
 import { useEffect, useRef, useState } from 'react';
-
-import useAuthToken from '@/pages/publications/components/useAuthToken';
 
 export default function FormAddItem({ onCancel }) {
     const {
