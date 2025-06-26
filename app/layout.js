@@ -1,10 +1,10 @@
+import { Suspense } from 'react';
+
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import TokenHandler from '@/components/auth/TokenHandler';
 import Footer from '@/components/footer/Footer';
 import Header from '@/components/header/Header';
-
-// ✅ composant client ici
 
 import './globals.css';
 
@@ -27,7 +27,9 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                <TokenHandler />
+                <Suspense fallback={null}>
+                    <TokenHandler />
+                </Suspense>
                 <Header />
                 {children}
                 <Footer />
