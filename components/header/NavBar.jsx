@@ -3,44 +3,64 @@
 import Logo from '@/public/img/logo.png';
 import { Menu, X } from 'lucide-react';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
-const navItems = [
+const baseNavItems = [
     { label: 'TakeItFree', href: '/' },
     { label: 'Explore-Items', href: '/explore-items' },
-    { label: 'Publier-Items', href: '/publier-items' },
-    { label: 'Mes-Items', href: '/mes-items' },
+    { label: 'Publier-Items', href: '/publier-items', auth: true },
+    { label: 'Mes-Items', href: '/mes-items', auth: true },
     { label: 'Contactez-nous', href: '/contactez-nous' },
 ];
 
 export default function NavBars() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
 
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
-
     const isActive = (href) => pathname === href;
+
+    useEffect(() => {
+        const checkToken = () => {
+            const token = localStorage.getItem('token');
+            console.log('🔍 Token dans NavBars:', token);
+            setIsAuthenticated(!!token);
+        };
+
+        checkToken();
+        const intervalId = setInterval(checkToken, 1000);
+        return () => clearInterval(intervalId);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+        closeMenu();
+        router.push('/');
+    };
+
+    const navItems = baseNavItems.filter((item) => !item.auth || isAuthenticated);
 
     return (
         <nav className="bg-green-800 text-secondary-color shadow-md relative z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-                {/* Logo */}
                 <Link href="/">
                     <Image
                         src={Logo}
-                        alt="Logo TakeItFre"
+                        alt="Logo TakeItFree"
                         width={70}
                         height={70}
                         className="rounded-full cursor-pointer"
                     />
                 </Link>
 
-                {/* Hamburger button */}
                 <button
                     className="sm:hidden text-black z-50"
                     onClick={toggleMenu}
@@ -49,8 +69,7 @@ export default function NavBars() {
                     {isOpen ? <X size={28} /> : <Menu size={28} />}
                 </button>
 
-                {/* Menu desktop */}
-                <ul className="hidden sm:flex gap-8 text-base sm:text-lg font-semibold">
+                <ul className="hidden sm:flex gap-8 text-base sm:text-lg font-semibold items-center">
                     {navItems.map(({ label, href }, i) => (
                         <li key={i}>
                             <Link
@@ -63,10 +82,20 @@ export default function NavBars() {
                             </Link>
                         </li>
                     ))}
+                    {isAuthenticated && (
+                        <li>
+                            <button
+                                onClick={handleLogout}
+                                className="text-red-300 hover:text-red-500 transition"
+                            >
+                                Déconnexion
+                            </button>
+                        </li>
+                    )}
                 </ul>
             </div>
 
-            {/* Overlay + mobile menu */}
+            {/* Mobile overlay */}
             <div
                 className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300 ${
                     isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
@@ -74,6 +103,7 @@ export default function NavBars() {
                 onClick={closeMenu}
             ></div>
 
+            {/* Mobile menu */}
             <div
                 className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 z-50 sm:hidden ${
                     isOpen ? 'translate-x-0' : 'translate-x-full'
@@ -94,6 +124,14 @@ export default function NavBars() {
                             {label}
                         </Link>
                     ))}
+                    {isAuthenticated && (
+                        <button
+                            onClick={handleLogout}
+                            className="w-full text-left text-red-500 hover:text-red-700"
+                        >
+                            Déconnexion
+                        </button>
+                    )}
                 </div>
             </div>
         </nav>
