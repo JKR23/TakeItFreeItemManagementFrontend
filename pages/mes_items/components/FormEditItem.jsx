@@ -34,7 +34,7 @@ export default function FormEditItem({ item, onCancel }) {
     useEffect(() => {
         const fetchStatuses = async () => {
             try {
-                const res = await fetch('http://localhost:8080/status/all');
+                const res = await fetch('https://takeitfreeitemmanagement.onrender.com/status/all');
                 const data = await res.json();
                 setStatusList(data);
             } catch (error) {
@@ -73,13 +73,16 @@ export default function FormEditItem({ item, onCancel }) {
             const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
             if (!token) throw new Error('Token JWT non trouvé');
 
-            const response = await fetch(`http://localhost:8080/item/update`, {
-                method: 'PUT',
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            const response = await fetch(
+                `https://takeitfreeitemmanagement.onrender.com/item/update`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
                 },
-                body: formData,
-            });
+            );
 
             if (!response.ok) throw new Error('Erreur lors de la modification');
 

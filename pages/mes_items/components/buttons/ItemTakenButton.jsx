@@ -3,9 +3,12 @@
 export default function ItemTakenButton({ itemId }) {
     const handleItemTaken = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/item/marked-taken/${itemId}`, {
-                method: 'PUT',
-            });
+            const response = await fetch(
+                `https://takeitfreeitemmanagement.onrender.com/item/marked-taken/${itemId}`,
+                {
+                    method: 'PUT',
+                },
+            );
 
             if (!response.ok) {
                 console.error('Erreur lors de la mise à jour de l’item');

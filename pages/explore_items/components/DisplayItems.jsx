@@ -24,7 +24,9 @@ export default function DisplayItems({ items: itemsFromProps = [] }) {
 
     const loadDefaultItems = async () => {
         try {
-            const response = await fetch('http://localhost:8080/status/items-all');
+            const response = await fetch(
+                'https://takeitfreeitemmanagement.onrender.com/status/items-all',
+            );
             const data = await response.json();
 
             if (!Array.isArray(data)) {

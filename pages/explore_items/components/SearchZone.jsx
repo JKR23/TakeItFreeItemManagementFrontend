@@ -18,7 +18,7 @@ export default function SearchZone({ onResults }) {
             setError('');
             try {
                 const response = await fetch(
-                    `http://localhost:8080/item/by-title?title=${encodeURIComponent(query)}`,
+                    `https://takeitfreeitemmanagement.onrender.com/item/by-title?title=${encodeURIComponent(query)}`,
                 );
                 if (!response.ok) throw new Error('Erreur lors de la recherche');
                 const data = await response.json();
