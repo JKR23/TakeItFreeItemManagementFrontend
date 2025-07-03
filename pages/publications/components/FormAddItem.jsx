@@ -29,7 +29,7 @@ export default function FormAddItem({ onCancel }) {
     useEffect(() => {
         const fetchStatuses = async () => {
             try {
-                const res = await fetch('http://localhost:8080/status/all');
+                const res = await fetch('https://takeitfreeitemmanagement.onrender.com/status/all');
                 const data = await res.json();
                 setStatusList(data);
             } catch (error) {
@@ -68,13 +68,16 @@ export default function FormAddItem({ onCancel }) {
             formData.append('statusId', data.statusId);
             formData.append('image', data.imageFile[0]);
 
-            const response = await fetch(`http://localhost:8080/item/publisher-items`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            const response = await fetch(
+                `https://takeitfreeitemmanagement.onrender.com/item/publisher-items`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
                 },
-                body: formData,
-            });
+            );
 
             if (!response.ok) throw new Error('Erreur lors de la création');
 

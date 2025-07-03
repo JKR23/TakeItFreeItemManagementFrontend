@@ -31,11 +31,14 @@ export default function DisplayMesItems({ items: itemsFromProps = [] }) {
                 return;
             }
 
-            const response = await fetch('http://localhost:8080/item/my-items', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            const response = await fetch(
+                'https://takeitfreeitemmanagement.onrender.com/item/my-items',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 },
-            });
+            );
 
             if (!response.ok) {
                 console.error('Erreur HTTP:', response.status);
