@@ -21,6 +21,9 @@ export default function FormAddItem({ onCancel }) {
 
     const { token, isExpired } = useAuthToken(); // ✅ utilisation du hook
 
+    console.log('🟡 Token récupéré :', token);
+    console.log('🟡 Est expiré ? ', isExpired);
+
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
         libraries: ['places'],
@@ -29,11 +32,13 @@ export default function FormAddItem({ onCancel }) {
     useEffect(() => {
         const fetchStatuses = async () => {
             try {
+                console.log('🔄 Récupération des statuts...');
                 const res = await fetch('https://takeitfreeitemmanagement.onrender.com/status/all');
                 const data = await res.json();
+                console.log('✅ Statuts récupérés :', data);
                 setStatusList(data);
             } catch (error) {
-                console.error('Erreur lors de la récupération des statuts :', error);
+                console.error('❌ Erreur lors de la récupération des statuts :', error);
             }
         };
         fetchStatuses();
@@ -49,6 +54,8 @@ export default function FormAddItem({ onCancel }) {
 
         autocomplete.addListener('place_changed', () => {
             const place = autocomplete.getPlace();
+            console.log('📍 Adresse sélectionnée :', place);
+
             if (place.formatted_address) {
                 setValue('adresse', place.formatted_address);
             }
@@ -56,7 +63,10 @@ export default function FormAddItem({ onCancel }) {
     }, [isLoaded, setValue]);
 
     const onSubmit = async (data) => {
+        console.log('📤 Données du formulaire :', data);
+
         if (!token || isExpired) {
+            console.warn('⚠️ Jeton manquant ou expiré');
             setMessage('⚠️ Votre session est expirée.');
             return;
         }
@@ -67,6 +77,8 @@ export default function FormAddItem({ onCancel }) {
             formData.append('postalCode', data.adresse);
             formData.append('statusId', data.statusId);
             formData.append('image', data.imageFile[0]);
+
+            console.log('📦 FormData préparé, envoi vers backend...');
 
             const response = await fetch(
                 `https://takeitfreeitemmanagement.onrender.com/item/publisher-items`,
@@ -79,13 +91,19 @@ export default function FormAddItem({ onCancel }) {
                 },
             );
 
-            if (!response.ok) throw new Error('Erreur lors de la création');
+            console.log('📨 Réponse du backend :', response);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Réponse non OK :', errorText);
+                throw new Error('Erreur lors de la création');
+            }
 
             setMessage('✅ Objet ajouté avec succès !');
             reset();
             setTimeout(() => setMessage(''), 2000);
         } catch (error) {
-            console.error('Erreur lors de la création :', error);
+            console.error('❌ Erreur lors de la création :', error);
             setMessage("❌ Échec de l'ajout de l'objet.");
         }
     };
