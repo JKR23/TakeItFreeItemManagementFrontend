@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 export default function DoYouHaveItem() {
     const handleClick = () => {
-        const token = localStorage.getItem('access_token');
+        const token = localStorage.getItem('token');
 
         if (token) {
             // Redirige vers la page de publication d'items si connecté
