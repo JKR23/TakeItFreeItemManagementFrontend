@@ -19,10 +19,7 @@ export default function FormAddItem({ onCancel }) {
     const [statusList, setStatusList] = useState([]);
     const addressRef = useRef(null);
 
-    const { token, isExpired } = useAuthToken(); // ✅ utilisation du hook
-
-    console.log('🟡 Token récupéré :', token);
-    console.log('🟡 Est expiré ? ', isExpired);
+    const { token, isExpired } = useAuthToken();
 
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -35,9 +32,14 @@ export default function FormAddItem({ onCancel }) {
                 console.log('🔄 Récupération des statuts...');
                 const res = await fetch('https://takeitfreeitemmanagement.onrender.com/status/all');
                 const data = await res.json();
-                console.log('✅ Statuts récupérés (typeof) :', typeof data);
-                console.log('✅ Statuts récupérés (brut) :', data);
-                setStatusList(data);
+                console.log('✅ Statuts récupérés (brut):', data);
+
+                if (Array.isArray(data)) {
+                    setStatusList(data);
+                } else {
+                    console.error('❌ Données reçues inattendues :', data);
+                    setStatusList([]);
+                }
             } catch (error) {
                 console.error('❌ Erreur lors de la récupération des statuts :', error);
             }
@@ -55,8 +57,6 @@ export default function FormAddItem({ onCancel }) {
 
         autocomplete.addListener('place_changed', () => {
             const place = autocomplete.getPlace();
-            console.log('📍 Adresse sélectionnée :', place);
-
             if (place.formatted_address) {
                 setValue('adresse', place.formatted_address);
             }
@@ -64,10 +64,7 @@ export default function FormAddItem({ onCancel }) {
     }, [isLoaded, setValue]);
 
     const onSubmit = async (data) => {
-        console.log('📤 Données du formulaire :', data);
-
         if (!token || isExpired) {
-            console.warn('⚠️ Jeton manquant ou expiré');
             setMessage('⚠️ Votre session est expirée.');
             return;
         }
@@ -79,10 +76,8 @@ export default function FormAddItem({ onCancel }) {
             formData.append('statusId', data.statusId);
             formData.append('image', data.imageFile[0]);
 
-            console.log('📦 FormData préparé, envoi vers backend...');
-
             const response = await fetch(
-                `https://takeitfreeitemmanagement.onrender.com/item/publisher-items`,
+                'https://takeitfreeitemmanagement.onrender.com/item/publisher-items',
                 {
                     method: 'POST',
                     headers: {
@@ -91,8 +86,6 @@ export default function FormAddItem({ onCancel }) {
                     body: formData,
                 },
             );
-
-            console.log('📨 Réponse du backend :', response);
 
             if (!response.ok) {
                 const errorText = await response.text();
@@ -157,11 +150,12 @@ export default function FormAddItem({ onCancel }) {
                     className="w-full px-4 py-2 border-b rounded focus:border-green-700 focus:outline-none text-green-700"
                 >
                     <option value="">-- Choisir un statut --</option>
-                    {statusList.map((status) => (
-                        <option key={status.id} value={status.id}>
-                            {status.name}
-                        </option>
-                    ))}
+                    {Array.isArray(statusList) &&
+                        statusList.map((status) => (
+                            <option key={status.id} value={status.id}>
+                                {status.name}
+                            </option>
+                        ))}
                 </select>
                 {errors.statusId && <p className="text-red-600">{errors.statusId.message}</p>}
 
