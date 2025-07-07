@@ -35,7 +35,8 @@ export default function FormAddItem({ onCancel }) {
                 console.log('🔄 Récupération des statuts...');
                 const res = await fetch('https://takeitfreeitemmanagement.onrender.com/status/all');
                 const data = await res.json();
-                console.log('✅ Statuts récupérés :', data);
+                console.log('✅ Statuts récupérés (typeof) :', typeof data);
+                console.log('✅ Statuts récupérés (brut) :', data);
                 setStatusList(data);
             } catch (error) {
                 console.error('❌ Erreur lors de la récupération des statuts :', error);
