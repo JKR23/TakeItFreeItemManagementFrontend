@@ -39,11 +39,35 @@ export default function NavBars() {
         return () => clearInterval(intervalId);
     }, []);
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        setIsAuthenticated(false);
-        closeMenu();
-        router.push('/');
+    const handleLogout = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+            const response = await fetch(
+                'https://takeitfreeauthbackend-83rr.onrender.com/user/logout',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                },
+            );
+
+            if (response.ok) {
+                console.log('✅ Déconnexion réussie côté backend');
+            } else {
+                console.warn('❌ Échec de la déconnexion côté backend');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion :', error);
+        } finally {
+            localStorage.removeItem('token');
+            setIsAuthenticated(false);
+            closeMenu();
+            router.push('/');
+        }
     };
 
     const navItems = baseNavItems.filter((item) => !item.auth || isAuthenticated);
@@ -86,7 +110,7 @@ export default function NavBars() {
                         <li>
                             <button
                                 onClick={handleLogout}
-                                className="text-red-300 hover:text-red-500 transition"
+                                className="text-red-300 hover:text-red-500 transition cursor-pointer"
                             >
                                 Déconnexion
                             </button>

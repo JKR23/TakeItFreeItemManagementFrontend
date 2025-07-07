@@ -5,8 +5,6 @@ import { useState } from 'react';
 import SearchZone from '@/pages/explore_items/components/SearchZone';
 import DisplayMesItems from '@/pages/mes_items/components/DisplayMesItems';
 
-// @/pages/mes_items/page.jsx
-
 export default function MesItems() {
     const [filteredItems, setFilteredItems] = useState(null);
 
