@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 
 import { useEffect, useRef, useState } from 'react';
 
-export default function FormAddItem({ onCancel }) {
+export default function FormAddItem() {
     const {
         register,
         handleSubmit,
@@ -18,6 +18,7 @@ export default function FormAddItem({ onCancel }) {
     const [message, setMessage] = useState('');
     const [statusList, setStatusList] = useState([]);
     const addressRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const { token, isExpired } = useAuthToken();
 
@@ -62,6 +63,14 @@ export default function FormAddItem({ onCancel }) {
             }
         });
     }, [isLoaded, setValue]);
+
+    const onCancel = () => {
+        reset(); // réinitialise tous les champs contrôlés
+        if (fileInputRef.current) {
+            fileInputRef.current.value = null; // vide le fichier
+        }
+        setMessage(''); // enlève le message
+    };
 
     const onSubmit = async (data) => {
         if (!token || isExpired) {
@@ -138,6 +147,7 @@ export default function FormAddItem({ onCancel }) {
                 <input
                     type="file"
                     accept="image/*"
+                    ref={fileInputRef}
                     {...register('imageFile', {
                         required: 'Une image est requise',
                     })}
@@ -162,14 +172,14 @@ export default function FormAddItem({ onCancel }) {
                 <div className="flex justify-between gap-4">
                     <button
                         type="submit"
-                        className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
+                        className="bg-green-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-green-700 transition"
                     >
                         Publier
                     </button>
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition"
+                        className="bg-yellow-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-yellow-700 transition"
                     >
                         Annuler
                     </button>

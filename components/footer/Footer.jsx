@@ -71,7 +71,7 @@ export default function Footers() {
                         <p className="text-sm text-white/80 text-justify">
                             Notre approche repose sur l'écoute de vos besoins et une interaction
                             personnalisée. Chaque objet a son histoire et sa valeur, c'est pourquoi
-                            nous traitons chaque publication avec attention afin de faciliter les
+                            nous traitons chaque publication avec attention enfin de faciliter les
                             échanges les plus utiles et gratifiants.
                         </p>
                     </div>
